@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AKASHA Consultancy</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --black:#0B0B0F;
+  --gold1:#FFB800;
+  --gold2:#FF4D00;
+  --blue:#0A3FFF;
+  --light:#EAEAEA;
+  --light-gold:#FFD966;
+  --navH: 110px; /* JS updates */
+}
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;scroll-behavior:smooth;}
+
+html{background:var(--black);}
+
+body{
+  background:transparent;
+  color:var(--light);
+  font-family:'Inter',sans-serif;
+  overflow-x:hidden;
+}
+
+/* ✅ CYCLING BACKGROUND (7 chakra wallpapers) */
+.bg-cycle{
+  position:fixed;
+  inset:0;
+  z-index:-5;
+  overflow:hidden;
+  pointer-events:none;
+}
+.bg-cycle .bg{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  animation:bgFade 17.5s infinite ease-in-out;
+  will-change:opacity;
+}
+
+/* PREMIUM FILL (two layers per slide)
+   - ::before = blurred "cover" fill (always fills screen)
+   - ::after  = sharp "contain" (full artwork always visible)
+*/
+.bg-cycle .bg::before,
+.bg-cycle .bg::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:var(--bg);
+  background-repeat:no-repeat;
+  background-position:center;
+}
+.bg-cycle .bg::before{
+  inset:-60px;
+  background-size:cover;
+  filter:blur(22px) saturate(1.2);
+  opacity:0.70;
+  animation:bgDrift 18s infinite alternate ease-in-out;
+  will-change:transform;
+}
+.bg-cycle .bg::after{
+  background-size:contain;
+  /* Keep the full top visible beneath the fixed navigation */
+  background-position:center calc(50% + 64px);
+  opacity:1;
+}
+
+/* Dark overlay for readability (keeps background visible, but text stays crisp) */
+.bg-overlay{
+  position:fixed;
+  inset:0;
+  z-index:-4;
+  pointer-events:none;
+  background:
+    radial-gradient(1200px 800px at 50% 20%, rgba(0,0,0,0.10), rgba(0,0,0,0.46) 70%),
+    linear-gradient(to bottom, rgba(0,0,0,0.22), rgba(0,0,0,0.44));
+}
+
+@keyframes bgFade{
+  0%{opacity:0;}
+  6%{opacity:1;}
+  18%{opacity:1;}
+  26%{opacity:0;}
+  100%{opacity:0;}
+}
+@keyframes bgDrift{
+  0%{transform:scale(1.06) translate3d(-10px,-10px,0);}
+  100%{transform:scale(1.14) translate3d(10px,10px,0);}
+}
+
+/* NAVIGATION */
+nav{
+  position:fixed;
+  top:0; left:0;
+  width:100%;
+  padding:16px 10%;
+  background:rgba(0,0,0,0.70);
+  backdrop-filter:blur(10px);
+  z-index:1000;
+}
+
+/* top row */
+.nav-bar{
+  position:relative;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+}
+
+nav h3{
+  font-family:'Playfair Display',serif;
+  letter-spacing:2px;
+  background:linear-gradient(90deg,var(--gold1),var(--gold2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmer 3s infinite linear;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.nav-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+/* desktop links row */
+.desktop-links{
+  margin-top:12px;
+  display:flex;
+  justify-content:flex-end;
+  gap:26px;
+  flex-wrap:wrap;
+}
+
+nav a{
+  color:var(--light);
+  text-decoration:none;
+  font-size:14px;
+  transition:0.3s;
+  white-space:nowrap;
+}
+nav a:hover{color:var(--gold1);}
+
+/* MENU BUTTON (mobile) */
+.menu-btn{
+  display:none;
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(0,0,0,0.35);
+  color:var(--light);
+  border-radius:12px;
+  padding:10px 12px;
+  cursor:pointer;
+  transition:0.25s;
+  line-height:1;
+  font-size:16px;
+}
+.menu-btn:hover{
+  border-color:rgba(255,184,0,0.5);
+  box-shadow:0 0 20px rgba(255,184,0,0.15);
+}
+
+/* ✅ MOBILE MENU DROPDOWN (RIGHT-ALIGNED PANEL) */
+.mobile-menu{
+  display:none;
+  position:absolute;
+  top:calc(100% + 12px);
+  right:0;
+  width:min(86vw, 320px);
+  border:1px solid rgba(255,255,255,0.10);
+  background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(12px);
+  border-radius:18px;
+  padding:10px;
+  box-shadow:0 0 30px rgba(0,0,0,0.45);
+}
+.mobile-menu a{
+  display:block;
+  padding:12px 12px;
+  border-radius:12px;
+  font-size:15px;
+  letter-spacing:0.2px;
+  text-align:right;
+}
+.mobile-menu a:hover{background:rgba(255,184,0,0.10);}
+nav.menu-open .mobile-menu{display:block;}
+
+/* LANGUAGE SELECTOR */
+.lang-select{position:relative;display:inline-flex;align-items:center;}
+.lang-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.10);
+  background:rgba(0,0,0,0.35);
+  color:var(--light);
+  cursor:pointer;
+  transition:0.3s;
+  user-select:none;
+}
+.lang-btn:hover{
+  border-color:rgba(255,184,0,0.5);
+  box-shadow:0 0 20px rgba(255,184,0,0.15);
+}
+.lang-flag{font-size:16px;line-height:1;filter:drop-shadow(0 0 10px rgba(255,184,0,0.20));}
+.lang-code{font-size:12px;letter-spacing:1px;opacity:0.9;}
+.lang-caret{font-size:12px;opacity:0.8;}
+
+.lang-menu{
+  position:absolute;
+  top:calc(100% + 10px);
+  right:0;
+  min-width:270px;
+  max-height:380px;
+  overflow:auto;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,0.10);
+  background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(12px);
+  box-shadow:0 0 30px rgba(0,0,0,0.45);
+  padding:8px;
+  display:none;
+  z-index:2000;
+}
+.lang-select.open .lang-menu{display:block;}
+
+.lang-item{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 10px;
+  border-radius:12px;
+  border:0;
+  background:transparent;
+  color:var(--light);
+  cursor:pointer;
+  text-align:left;
+  transition:0.25s;
+}
+.lang-item:hover{background:rgba(255,184,0,0.10);}
+.lang-item span:last-child{margin-left:auto;opacity:0.8;font-size:12px;letter-spacing:0.8px;}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  position:relative;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  overflow:hidden;
+  padding-top: calc(var(--navH) + 40px);
+  padding-bottom:60px;
+}
+.hero-content{
+  position:relative;
+  z-index:3;
+  animation:fadeIn 2s ease-out;
+  width:100%;
+  max-width:1100px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:40px;
+}
+.hero img{
+  width:400px;
+  max-width:80%;
+  margin:22px auto 26px auto;
+  display:block;
+  filter:drop-shadow(0 0 40px rgba(255,184,0,0.5));
+}
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:60px;
+  background:linear-gradient(90deg,var(--gold1),var(--gold2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmer 17.5s infinite linear;
+}
+.hero p{margin-top:18px;font-size:22px;opacity:0.95;}
+
+/* ✅ Hero text: avoid ugly justify spacing on short lines */
+.hero .readable-gold{
+  max-width:900px;
+  margin-left:auto;
+  margin-right:auto;
+  text-align:center;
+  text-justify:auto;
+  word-spacing:normal;
+  word-break:normal;
+  overflow-wrap:normal;
+  text-wrap:pretty;
+}
+
+/* BUTTON */
+.button{
+  margin-top:40px;
+  padding:18px 50px;
+  border:none;
+  background:linear-gradient(90deg,var(--gold1),var(--gold2));
+  color:black;
+  font-weight:500;
+  cursor:pointer;
+  transition:0.4s;
+  font-size:18px;
+  border-radius:14px;
+  opacity:0.7;
+}
+.button:hover{
+  transform:scale(1.05);
+  opacity:0.9;
+}
+
+/* PARTICLE CANVAS (fixed to viewport so it stays while scrolling) */
+#particles,#stars,#glowLayer{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  z-index:-3; /* above background (-5/-4) but below content */
+  pointer-events:none;
+}
+
+/* DIVIDER */
+.divider{
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold1),transparent);
+  margin:20px 0;
+  opacity:0.9;
+}
+
+/* ✅ SECTIONS: use more screen space on desktop */
+section{
+  padding:110px 10%;
+  max-width:1920px;
+  margin:auto;
+}
+
+/* READABLE GOLD TEXT (global defaults) */
+.readable-gold{
+  max-width:950px;
+  margin:0 auto 1.2em auto;
+  text-align:center;
+  line-height:1.9;
+  letter-spacing:0.35px;
+  color:var(--light-gold);
+
+  -webkit-hyphens:none !important;
+  -ms-hyphens:none !important;
+  hyphens:none !important;
+  word-break:normal !important;
+  overflow-wrap:normal !important;
+}
+
+/* About + Vision stay justified */
+#philosophy .readable-gold,
+#vision .readable-gold{
+  max-width:1350px;
+  text-align:justify;
+  text-justify:inter-word;
+  letter-spacing:0.30px;
+  line-height:1.95;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* Mission centered */
+#mission .readable-gold{
+  max-width:1350px;
+  text-align:center;
+  line-height:1.95;
+  letter-spacing:0.30px;
+  margin-left:auto;
+  margin-right:auto;
+}
+/* HEADINGS */
+h2{
+  font-family:'Playfair Display',serif;
+  font-size:35px;
+  margin-bottom:40px;
+  text-align:center;
+  background:linear-gradient(90deg,var(--gold1),var(--gold2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmer 4s infinite linear;
+}
+
+/* SERVICE CARDS */
+.services{
+  display:flex;
+  justify-content:center;
+  align-items:stretch;
+  gap:60px;
+  flex-wrap:wrap;
+  text-align:center;
+}
+.card{
+  padding:40px 30px;
+  border:1px solid rgba(255,255,255,0.05);
+  transition:0.5s;
+  min-width:300px;
+  max-width:400px;
+  backdrop-filter:blur(5px);
+  border-radius:20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+.card:hover{
+  border-color:var(--blue);
+  box-shadow:0 0 35px rgba(10,63,255,0.3);
+}
+.services h3{margin-bottom:18px;}
+.services p{
+  text-align:center;
+  line-height:1.7;
+  margin-bottom:0;
+  -webkit-hyphens:none;
+  -ms-hyphens:none;
+  hyphens:none;
+  word-break:normal;
+  overflow-wrap:normal;
+
+  word-spacing:normal;
+  letter-spacing:0.10px;
+  text-justify:auto;
+  font-size:15px;
+}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(40px);transition:1s;}
+.reveal.active{opacity:1;transform:translateY(0);}
+
+/* MODAL */
+.modal-bg{
+  position:fixed;
+  top:0;left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.85);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity 0.6s ease;
+}
+.modal-bg.active{opacity:1;visibility:visible;}
+
+.modal-content{
+  background:var(--black);
+  padding:50px;
+  border-radius:18px;
+  max-width:600px;
+  width:92%;
+  position:relative;
+  transform:scale(0.8);
+  opacity:0;
+  transition:all 0.6s ease;
+}
+.modal-bg.active .modal-content{transform:scale(1);opacity:1;}
+
+.modal-content .shimmer-title{
+  font-family:'Playfair Display',serif;
+  font-size:32px;
+  text-align:center;
+  background:linear-gradient(90deg,var(--gold1),var(--gold2));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:shimmer 4s infinite linear;
+  margin-bottom:18px;
+}
+
+.modal-content .readable-gold{
+  max-width:520px;
+  margin:0 auto 1em auto;
+  text-align:justify;
+  text-justify:inter-word;
+  line-height:1.8;
+  -webkit-hyphens:none !important;
+  -ms-hyphens:none !important;
+  hyphens:none !important;
+  word-break:normal !important;
+  overflow-wrap:normal !important;
+}
+
+/* ✅ Perfectly aligned modal email button */
+.modal-content .email-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  max-width:460px;
+  margin:26px auto 0 auto;
+  padding:16px 18px;
+  text-align:center;
+  text-decoration:none;
+  box-sizing:border-box;
+}
+
+.close-modal{
+  position:absolute;
+  top:15px;
+  right:20px;
+  font-size:28px;
+  cursor:pointer;
+  color:var(--gold1);
+}
+
+/* FOOTER */
+footer{
+  padding:50px;
+  text-align:center;
+  border-top:1px solid rgba(255,255,255,0.05);
+  opacity:0.7;
+}
+
+/* RTL */
+body.rtl{direction:rtl;}
+body.rtl .lang-menu{right:auto;left:0;}
+body.rtl .mobile-menu{right:auto;left:0;}
+
+/* =========================
+   MOBILE
+   ========================= */
+@media (max-width: 820px){
+  nav{padding:14px 6%;}
+  .desktop-links{display:none;}
+  .menu-btn{display:inline-flex;align-items:center;justify-content:center;}
+
+  /* ✅ Mobile dropdown: compact, right-aligned, readable */
+  .mobile-menu{
+  position:fixed;
+  top:calc(var(--navH) + 8px);
+  right:6%;
+  left:auto;
+  width:min(78vw, 260px);
+  max-height:60vh;
+  overflow:auto;
+  padding:10px;
+  z-index:1500;
+}
+.mobile-menu a{
+  font-size:16px;
+  padding:14px 14px;
+  text-align:right;
+}
+
+  .hero h1{
+    font-size:clamp(22px, 6.2vw, 34px);
+    line-height:1.05;
+    padding:0 10px;
+    max-width:92vw;
+    margin:0 auto;
+    white-space:nowrap;
+    letter-spacing:1px;
+    text-wrap:balance;
+  }
+  .hero p{font-size:18px;line-height:1.65;padding:0 10px;}
+/* ✅ Hero lines: smaller, clean spacing (no stretched gaps) */
+.hero .readable-gold{
+  font-size:15px;
+  line-height:1.6;
+  text-align:center;
+  letter-spacing:0.15px;
+  word-spacing:normal;
+  text-justify:auto;
+  word-break:normal;
+  overflow-wrap:normal;
+  hyphens:none;
+  margin-top:14px;
+}
+  .hero img{width:320px;max-width:88%;margin:18px auto 22px auto;}
+
+  .button{
+    display:block;
+    width:min(92vw, 360px);
+    margin:22px auto 0 auto;
+    padding:16px 18px;
+    font-size:15px;
+    letter-spacing:0.15px;
+  }
+
+  section{padding:80px 7%;}
+  h2{font-size:30px;margin-bottom:26px;}
+
+  .readable-gold{
+    max-width:92vw;
+    font-size:16px;
+    line-height:1.85;
+    letter-spacing:0.25px;
+    text-align:left;
+    text-justify:auto;
+    word-break:normal;
+    overflow-wrap:normal;
+  }
+
+  /* keep About/Vision/Mission wide but within phone */
+  #philosophy .readable-gold,
+  #vision .readable-gold,
+  #mission .readable-gold{max-width:92vw;}
+
+  .services{gap:22px;}
+  .card{
+    min-width:unset;
+    width:100%;
+    max-width:520px;
+    padding:26px 20px;
+    border-radius:18px;
+  }
+
+  /* Better card reading on mobile */
+  .services p{
+    text-align:center;
+    line-height:1.75;
+    font-size:15px;
+    word-break:normal;
+    overflow-wrap:normal;
+  
+    word-spacing:normal;
+    letter-spacing:0.10px;
+    text-justify:auto;
+}
+
+  .modal-content{padding:28px 20px;}
+  .modal-content .shimmer-title{font-size:28px;}
+  .modal-content .email-btn{max-width:360px;}
+}
+
+@media (max-width: 420px){
+  .hero h1{font-size:36px;}
+  .modal-content .email-btn{
+    max-width:320px;
+    padding:14px 14px;
+    font-size:14px;
+  }
+}
+
+/* ANIMATIONS */
+@keyframes shimmer{0%{background-position:-500px 0;}100%{background-position:500px 0;}}
+@keyframes fadeIn{from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);}}
+
+
+
+
+/* ✅ Ensure hero dividers remain visible in flex layout */
+.hero-content .divider{
+  align-self:stretch;
+}
+
+
+/* ✅ Increase space above top divider (below title) */
+.hero-content h1 + .divider{
+  margin-top:40px;
+}
+
+/* ✅ Increase space between bottom divider and button */
+.hero-content .divider:last-of-type{
+  margin-bottom:40px;
+}
+
+
+/* ✅ Remove blurred color layer on mobile (prevents top color box effect) */
+@media (max-width: 820px){
+  .bg-cycle .bg::before{
+    display:none;
+  }
+}
+
+
+/* ✅ Fine-tune hero divider positioning */
+.hero-content h1 + .divider{
+  margin-top:30px; /* was 40px, raised by 10px */
+}
+
+.hero-content .divider:last-of-type{
+  margin-bottom:50px; /* was 40px, lowered by 10px */
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ✅ Background slideshow (fixed + centered on scroll) -->
+<div class="bg-cycle" aria-hidden="true">
+  <div class="bg" style="--bg:url('AKASHA (1. Root Chakra wallpaper).png'); animation-delay:0s;"></div>
+  <div class="bg" style="--bg:url('AKASHA (2. Sacral Chakra wallpaper).png'); animation-delay:2.5s;"></div>
+  <div class="bg" style="--bg:url('AKASHA (3. Solar Plexus Chakra wallpaper).png'); animation-delay:5s;"></div>
+  <div class="bg" style="--bg:url('AKASHA (4. Heart Chakra wallpaper).png'); animation-delay:7.5s;"></div>
+  <div class="bg" style="--bg:url('AKASHA (5. Throat Chakra wallpaper).png'); animation-delay:10s;"></div>
+  <div class="bg" style="--bg:url('AKASHA (6. Third Eye wallpaper).png'); animation-delay:12.5s;"></div>
+  <div class="bg" style="--bg:url('AKASHA (7. Crown Chakra wallpaper).png'); animation-delay:15s;"></div>
+</div>
+<div class="bg-overlay" aria-hidden="true"></div>
+
+<nav id="siteNav">
+  <div class="nav-bar">
+    <h3 id="homeLink">AKASHA</h3>
+
+    <div class="nav-actions">
+      <!-- Language selector -->
+      <div class="lang-select" id="langSelect">
+        <button class="lang-btn" id="langBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span class="lang-flag" id="langFlag">🇬🇧</span>
+          <span class="lang-code" id="langCode">EN</span>
+          <span class="lang-caret">▾</span>
+        </button>
+
+        <div class="lang-menu" id="langMenu" role="listbox" aria-label="Language">
+          <button class="lang-item" type="button" data-lang="pt-br"><span class="lang-flag">🇧🇷</span><span>Brazil</span><span>PT-BR</span></button>
+          <button class="lang-item" type="button" data-lang="ms-bn"><span class="lang-flag">🇧🇳</span><span>Brunei</span><span>MS-BN</span></button>
+          <button class="lang-item" type="button" data-lang="zh"><span class="lang-flag">🇨🇳</span><span>China</span><span>ZH</span></button>
+          <button class="lang-item" type="button" data-lang="ar-eg"><span class="lang-flag">🇪🇬</span><span>Egypt</span><span>AR-EG</span></button>
+          <button class="lang-item" type="button" data-lang="fi"><span class="lang-flag">🇫🇮</span><span>Finland</span><span>FI</span></button>
+          <button class="lang-item" type="button" data-lang="fr"><span class="lang-flag">🇫🇷</span><span>France</span><span>FR</span></button>
+          <button class="lang-item" type="button" data-lang="de"><span class="lang-flag">🇩🇪</span><span>Germany</span><span>DE</span></button>
+          <button class="lang-item" type="button" data-lang="is"><span class="lang-flag">🇮🇸</span><span>Iceland</span><span>IS</span></button>
+          <button class="lang-item" type="button" data-lang="hi"><span class="lang-flag">🇮🇳</span><span>India</span><span>HI</span></button>
+          <button class="lang-item" type="button" data-lang="id"><span class="lang-flag">🇮🇩</span><span>Indonesia</span><span>ID</span></button>
+          <button class="lang-item" type="button" data-lang="he"><span class="lang-flag">🇮🇱</span><span>Israel</span><span>HE</span></button>
+          <button class="lang-item" type="button" data-lang="ja"><span class="lang-flag">🇯🇵</span><span>Japan</span><span>JA</span></button>
+          <button class="lang-item" type="button" data-lang="lt"><span class="lang-flag">🇱🇹</span><span>Lithuania</span><span>LT</span></button>
+          <button class="lang-item" type="button" data-lang="ms"><span class="lang-flag">🇲🇾</span><span>Malaysia</span><span>MS</span></button>
+          <button class="lang-item" type="button" data-lang="no"><span class="lang-flag">🇳🇴</span><span>Norway</span><span>NO</span></button>
+          <button class="lang-item" type="button" data-lang="tl"><span class="lang-flag">🇵🇭</span><span>Philippines</span><span>TL</span></button>
+          <button class="lang-item" type="button" data-lang="pt"><span class="lang-flag">🇵🇹</span><span>Portugal</span><span>PT</span></button>
+          <button class="lang-item" type="button" data-lang="ru"><span class="lang-flag">🇷🇺</span><span>Russia</span><span>RU</span></button>
+          <button class="lang-item" type="button" data-lang="ar"><span class="lang-flag">🇸🇦</span><span>Saudi Arabia</span><span>AR</span></button>
+          <button class="lang-item" type="button" data-lang="es"><span class="lang-flag">🇪🇸</span><span>Spain</span><span>ES</span></button>
+          <button class="lang-item" type="button" data-lang="sv"><span class="lang-flag">🇸🇪</span><span>Sweden</span><span>SV</span></button>
+          <button class="lang-item" type="button" data-lang="sw"><span class="lang-flag">🇹🇿</span><span>Tanzania</span><span>SW</span></button>
+          <button class="lang-item" type="button" data-lang="th"><span class="lang-flag">🇹🇭</span><span>Thailand</span><span>TH</span></button>
+          <button class="lang-item" type="button" data-lang="en"><span class="lang-flag">🇬🇧</span><span>United Kingdom</span><span>EN</span></button>
+          <button class="lang-item" type="button" data-lang="vi"><span class="lang-flag">🇻🇳</span><span>Vietnam</span><span>VI</span></button>
+        </div>
+
+      </div>
+
+      <!-- Mobile menu button -->
+      <button class="menu-btn" id="menuBtn" type="button" aria-controls="mobileMenu" aria-expanded="false" aria-label="Open menu">☰</button>
+
+      <!-- Right-side dropdown panel -->
+      <div class="mobile-menu" id="mobileMenu">
+        <a href="#philosophy" data-i18n="nav_about">About</a>
+        <a href="#vision" data-i18n="nav_vision">Vision</a>
+        <a href="#mission" data-i18n="nav_mission">Mission</a>
+        <a href="#services" data-i18n="nav_services">Services</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop links -->
+  <div class="desktop-links" id="desktopLinks">
+    <a href="#philosophy" data-i18n="nav_about">About</a>
+    <a href="#vision" data-i18n="nav_vision">Vision</a>
+    <a href="#mission" data-i18n="nav_mission">Mission</a>
+    <a href="#services" data-i18n="nav_services">Services</a>
+  </div>
+</nav>
+
+<section class="hero" id="heroSection">
+  <canvas id="stars"></canvas>
+  <canvas id="particles"></canvas>
+  <canvas id="glowLayer"></canvas>
+
+  <div class="hero-content">
+    <h1 data-i18n="hero_title">AKASHA Consultancy</h1>
+    <div class="divider"></div>
+    <p class="readable-gold" data-i18n="hero_line2">Together, we create pathways to growth, harmony, and lasting impact.</p>
+
+    <div class="divider"></div>
+    <button class="button" id="openModalBtn" data-i18n="hero_cta">Request Private Consultation</button>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="philosophy" class="reveal">
+  <h2 data-i18n="wisdom_title">The Wisdom of Akasha</h2>
+  <p class="readable-gold" data-i18n="wisdom_body">
+    The Akasha Records are often described as a universal library, a living archive of all thoughts, words, and actions ever conceived. Continuously updated, they offer timeless wisdom and guidance for both personal and collective growth. At AKASHA Consultancy, we draw inspiration from this source to help individuals and organizations align with their highest potential.
+  </p>
+</section>
+
+<div class="divider"></div>
+
+<section id="vision" class="reveal">
+  <h2 data-i18n="vision_title">Vision</h2>
+  <p class="readable-gold" data-i18n="vision_body">
+    We are committed to nurturing human values, fostering harmony within society, and cultivating balance with nature. Our aim is to inspire people to unlock their unique talents and create lasting quality in both their inner and outer worlds. Through this work, we strive to generate opportunities, empower communities, and support meaningful change on a global scale.
+  </p>
+</section>
+
+<div class="divider"></div>
+
+<section id="mission" class="reveal">
+  <h2 data-i18n="mission_title">Mission</h2>
+  <p class="readable-gold" data-i18n="mission_body">
+    At AKASHA Consultancy, our mission is to enhance the quality of life and services by providing clear, transparent, and meaningful insights.
+  </p>
+</section>
+
+<div class="divider"></div>
+
+<section id="services" class="reveal">
+  <h2 data-i18n="services_title">What We Do</h2>
+  <div class="services">
+    <div class="card">
+      <h3 data-i18n="svc1_title">Analytical Insights</h3>
+      <p data-i18n="svc1_body">Analysis of public and private information to offer valuable perspectives on current and future projects.</p>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="svc2_title">Collaborative Communication</h3>
+      <p data-i18n="svc2_body">Building purposeful connections between organizations, businesses, and individuals.</p>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="svc3_title">Confidential Services</h3>
+      <p data-i18n="svc3_body">Tailoring solutions to unique needs with the highest respect for privacy and discretion.</p>
+    </div>
+  </div>
+</section>
+
+<footer data-i18n="footer">AKASHA Consultancy — Strategic Intelligence & Confidential Advisory 2026©️</footer>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal-content">
+    <span class="close-modal" id="closeModal">&times;</span>
+
+    <h2 class="shimmer-title" data-i18n="modal_title">
+      Request a Private Consultation
+      <div class="divider"></div>
+    </h2>
+
+    <p class="readable-gold" data-i18n="modal_body">
+      Providing a clear description of your matter and the objectives you intend to achieve enables us to assess its significance and determine the appropriate service fee, based on the scope, complexity, and urgency of the request.
+      <div class="divider"></div>
+          <p class="readable-gold">
+      Engagements are carried out through short-term or long-term contractual collaborations, depending on the nature and duration of the work involved.
+    </p>
+</p>
+    <div class="divider"></div>
+
+    <a class="button email-btn" href="mailto:everyday247work@gmail.com" data-i18n="modal_email">everyday247work@gmail.com</a>
+  </div>
+</div>
+
+<script>
+/* NAV HEIGHT -> HERO PADDING */
+function updateNavHeight(){
+  const nav = document.getElementById('siteNav');
+  document.documentElement.style.setProperty('--navH', nav.offsetHeight + 'px');
+}
+window.addEventListener('load', updateNavHeight);
+window.addEventListener('resize', updateNavHeight);
+
+/* MOBILE MENU */
+const nav = document.getElementById('siteNav');
+const menuBtn = document.getElementById('menuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+
+function closeMenu(){
+  nav.classList.remove('menu-open');
+  menuBtn.setAttribute('aria-expanded', 'false');
+  updateNavHeight();
+}
+function toggleMenu(){
+  // Close language dropdown when opening the menu
+  langSelect.classList.remove('open');
+  langBtn.setAttribute('aria-expanded',"false");
+
+  const isOpen = nav.classList.toggle('menu-open');
+  menuBtn.setAttribute('aria-expanded', String(isOpen));
+  updateNavHeight();
+}
+menuBtn.addEventListener('click', (e)=>{ e.stopPropagation(); toggleMenu(); });
+document.addEventListener('click', (e)=>{ if(!nav.contains(e.target)) closeMenu(); });
+mobileMenu.querySelectorAll('a').forEach(a=> a.addEventListener('click', closeMenu));
+window.addEventListener('resize', ()=>{ if(window.innerWidth > 820) closeMenu(); });
+
+/* REVEAL ON SCROLL */
+function reveal(){
+  document.querySelectorAll('.reveal').forEach(el=>{
+    const windowHeight = window.innerHeight;
+    const elementTop = el.getBoundingClientRect().top;
+    if(elementTop < windowHeight - 100) el.classList.add('active');
+  });
+}
+window.addEventListener('scroll', reveal);
+window.addEventListener('load', reveal);
+
+/* MODAL */
+const modal = document.getElementById('modal');
+document.getElementById('openModalBtn').onclick = () => {
+  modal.classList.add('active');
+  document.body.style.overflow = "hidden";
+};
+document.getElementById('closeModal').onclick = () => {
+  modal.classList.remove('active');
+  document.body.style.overflow = "auto";
+};
+window.onclick = e => {
+  if(e.target === modal){
+    modal.classList.remove('active');
+    document.body.style.overflow = "auto";
+  }
+};
+
+document.getElementById('homeLink').onclick = () => {
+  document.getElementById('heroSection').scrollIntoView({behavior:'smooth'});
+  closeMenu();
+};
+
+/* PARTICLES + STARS */
+const canvases = ['particles','stars','glowLayer'].map(id => document.getElementById(id));
+const ctxs = canvases.map(c => c.getContext('2d'));
+
+function resizeCanvases(){
+  canvases.forEach(c=>{
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+  });
+}
+resizeCanvases();
+window.addEventListener('resize', resizeCanvases);
+
+let particles=[];
+for(let i=0;i<200;i++){
+  particles.push({x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,size:Math.random()*2+1,speed:Math.random()*0.5+0.2});
+}
+function animateParticles(){
+  ctxs[0].clearRect(0,0,window.innerWidth,window.innerHeight);
+  particles.forEach(p=>{
+    ctxs[0].beginPath();
+    ctxs[0].arc(p.x,p.y,p.size,0,Math.PI*2);
+    ctxs[0].fillStyle='rgba(255,184,0,0.7)';
+    ctxs[0].fill();
+    p.y -= p.speed;
+    if(p.y<0)p.y=window.innerHeight;
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+let stars=[];
+for(let i=0;i<150;i++){
+  stars.push({x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight, size:Math.random()*1.5});
+}
+function animateStars(){
+  ctxs[1].clearRect(0,0,window.innerWidth,window.innerHeight);
+  stars.forEach(s=>{
+    ctxs[1].fillStyle='rgba(255,255,255,0.3)';
+    ctxs[1].beginPath();
+    ctxs[1].arc(s.x,s.y,s.size,0,Math.PI*2);
+    ctxs[1].fill();
+  });
+  requestAnimationFrame(animateStars);
+}
+animateStars();
+
+/* =========================
+   ✅ LANGUAGE TRANSLATION
+   ========================= */
+
+/* UI meta */
+const LANG_META = {
+  en:{flag:"🇬🇧",code:"EN",dir:"ltr"},
+  fr:{flag:"🇫🇷",code:"FR",dir:"ltr"},
+  es:{flag:"🇪🇸",code:"ES",dir:"ltr"},
+  ru:{flag:"🇷🇺",code:"RU",dir:"ltr"},
+  ar:{flag:"🇸🇦",code:"AR",dir:"rtl"},
+  zh:{flag:"🇨🇳",code:"ZH",dir:"ltr"},
+
+  he:{flag:"🇮🇱",code:"HE",dir:"rtl"},
+
+  lt:{flag:"🇱🇹",code:"LT",dir:"ltr"},
+  pt:{flag:"🇵🇹",code:"PT",dir:"ltr"},
+  de:{flag:"🇩🇪",code:"DE",dir:"ltr"},
+  hi:{flag:"🇮🇳",code:"HI",dir:"ltr"},
+  ja:{flag:"🇯🇵",code:"JA",dir:"ltr"},
+  vi:{flag:"🇻🇳",code:"VI",dir:"ltr"},
+  th:{flag:"🇹🇭",code:"TH",dir:"ltr"},
+  sw:{flag:"🇹🇿",code:"SW",dir:"ltr"},
+
+  "es-mx":{flag:"🇲🇽",code:"ES-MX",dir:"ltr"},
+  "pt-br":{flag:"🇧🇷",code:"PT-BR",dir:"ltr"},
+  tl:{flag:"🇵🇭",code:"TL",dir:"ltr"},
+
+  sv:{flag:"🇸🇪",code:"SV",dir:"ltr"},
+  no:{flag:"🇳🇴",code:"NO",dir:"ltr"},
+  fi:{flag:"🇫🇮",code:"FI",dir:"ltr"},
+  "ar-eg":{flag:"🇪🇬",code:"AR-EG",dir:"rtl"},
+  ms:{flag:"🇲🇾",code:"MS",dir:"ltr"},
+  "ms-bn":{flag:"🇧🇳",code:"MS-BN",dir:"ltr"},
+  id:{flag:"🇮🇩",code:"ID",dir:"ltr"},
+  is:{flag:"🇮🇸",code:"IS",dir:"ltr"},
+  kl:{flag:"🇬🇱",code:"KL",dir:"ltr"},
+  "en-sg":{flag:"🇸🇬",code:"EN-SG",dir:"ltr"},
+  "de-ch":{flag:"🇨🇭",code:"DE-CH",dir:"ltr"}
+};
+
+const I18N = {
+  en: {
+    nav_about:"About", nav_vision:"Vision", nav_mission:"Mission", nav_services:"Services",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Choosing AKASHA Consultancy means taking a step closer to your vision.",
+    hero_line2:"Together, we create pathways to growth, harmony, and lasting impact.",
+    hero_cta:"Request Private Consultation",
+    wisdom_title:"The Wisdom of Akasha",
+    wisdom_body:"The Akasha Records are often described as a universal library, a living archive of all thoughts, words, and actions ever conceived. Continuously updated, they offer timeless wisdom and guidance for both personal and collective growth. At AKASHA Consultancy, we draw inspiration from this source to help individuals and organizations align with their highest potential.",
+    vision_title:"Vision",
+    vision_body:"We are committed to nurturing human values, fostering harmony within society, and cultivating balance with nature. Our aim is to inspire people to unlock their unique talents and create lasting quality in both their inner and outer worlds. Through this work, we strive to generate opportunities, empower communities, and support meaningful change on a global scale.",
+    mission_title:"Mission",
+    mission_body:"At AKASHA Consultancy, our mission is to enhance the quality of life and services by providing clear, transparent, and meaningful insights.",
+    services_title:"What We Do",
+    svc1_title:"Analytical Insights",
+    svc1_body:"Analysis of public and private information to offer valuable perspectives on current and future projects.",
+    svc2_title:"Collaborative Communication",
+    svc2_body:"Building purposeful connections between organizations, businesses, and individuals.",
+    svc3_title:"Confidential Services",
+    svc3_body:"Tailoring solutions to unique needs with the highest respect for privacy and discretion.",
+    modal_title:"Request a Private Consultation",
+    modal_body:"Providing a clear description of your matter and the objectives you intend to achieve enables us to assess its significance and determine the appropriate service fee, based on the scope, complexity, and urgency of the request.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Strategic Intelligence & Confidential Advisory 2026©️"
+  },
+
+  he: {
+    nav_about:"אודות", nav_vision:"חזון", nav_mission:"משימה", nav_services:"שירותים",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"בחירה ב-AKASHA Consultancy היא צעד נוסף לקראת החזון שלך.",
+    hero_line2:"יחד אנו יוצרים נתיבים לצמיחה, הרמוניה והשפעה מתמשכת.",
+    hero_cta:"בקשת ייעוץ פרטי",
+    wisdom_title:"חוכמת האקשה",
+    wisdom_body:"רשומות האקשה מתוארות לעיתים כספרייה אוניברסלית — ארכיון חי של כל מחשבה, מילה ומעשה שנוצרו אי פעם. הן מתעדכנות באופן מתמיד ומציעות חוכמה על-זמנית והכוונה לצמיחה אישית וקולקטיבית. ב-AKASHA Consultancy אנו שואבים השראה ממקור זה כדי לסייע ליחידים ולארגונים להתיישר עם הפוטנציאל הגבוה ביותר שלהם.",
+    vision_title:"חזון",
+    vision_body:"אנו מחויבים לטיפוח ערכים אנושיים, לקידום הרמוניה בחברה ולשמירה על איזון עם הטבע. מטרתנו היא לעורר השראה לפתיחת כישרונות ייחודיים וליצירת איכות מתמשכת בעולם הפנימי והחיצוני. באמצעות עבודה זו אנו שואפים ליצור הזדמנויות, להעצים קהילות ולתמוך בשינוי משמעותי ברמה הגלובלית.",
+    mission_title:"משימה",
+    mission_body:"המשימה של AKASHA Consultancy היא לשפר את איכות החיים והשירותים באמצעות תובנות ברורות, שקופות ובעלות ערך.",
+    services_title:"מה אנו עושים",
+    svc1_title:"תובנות אנליטיות",
+    svc1_body:"ניתוח מידע ציבורי ופרטי לצורך מתן פרספקטיבה בעלת ערך על פרויקטים עכשוויים ועתידיים.",
+    svc2_title:"תקשורת שיתופית",
+    svc2_body:"בניית חיבורים ממוקדי מטרה בין ארגונים, עסקים ואנשים.",
+    svc3_title:"שירותים דיסקרטיים",
+    svc3_body:"התאמת פתרונות לצרכים ייחודיים תוך שמירה מרבית על פרטיות ודיסקרטיות.",
+    modal_title:"בקשת ייעוץ פרטי",
+    modal_body:"תיאור ברור של העניין והיעדים שלך מאפשר לנו להעריך את חשיבותו ולקבוע את שכר הטרחה המתאים בהתאם להיקף, למורכבות ולדחיפות הבקשה; התשלום מתבצע ב-Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — מודיעין אסטרטגי וייעוץ דיסקרטי 2026©️"
+  },
+
+  fr: {
+    nav_about:"À propos", nav_vision:"Vision", nav_mission:"Mission", nav_services:"Services",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Choisir AKASHA Consultancy, c’est faire un pas de plus vers votre vision.",
+    hero_line2:"Ensemble, nous créons des voies de croissance, d’harmonie et d’impact durable.",
+    hero_cta:"Demander une consultation privée",
+    wisdom_title:"La sagesse d’Akasha",
+    wisdom_body:"Les Archives Akashiques sont souvent décrites comme une bibliothèque universelle, une archive vivante de toutes les pensées, paroles et actions jamais conçues. Continuellement mises à jour, elles offrent une sagesse intemporelle et des orientations pour une croissance personnelle et collective. Chez AKASHA Consultancy, nous puisons dans cette source pour aider les individus et les organisations à s’aligner sur leur plus haut potentiel.",
+    vision_title:"Vision",
+    vision_body:"Nous nous engageons à nourrir les valeurs humaines, à favoriser l’harmonie au sein de la société et à cultiver l’équilibre avec la nature. Notre objectif est d’inspirer chacun à révéler ses talents uniques et à créer une qualité durable, intérieure comme extérieure. Par ce travail, nous cherchons à générer des opportunités, à renforcer les communautés et à soutenir un changement porteur de sens à l’échelle mondiale.",
+    mission_title:"Mission",
+    mission_body:"Chez AKASHA Consultancy, notre mission est d’améliorer la qualité de vie et des services en apportant des analyses claires, transparentes et pertinentes.",
+    services_title:"Ce que nous faisons",
+    svc1_title:"Analyses approfondies",
+    svc1_body:"Analyse d’informations publiques et privées afin d’offrir des perspectives utiles sur les projets actuels et futurs.",
+    svc2_title:"Communication collaborative",
+    svc2_body:"Création de liens porteurs de sens entre organisations, entreprises et individus.",
+    svc3_title:"Services confidentiels",
+    svc3_body:"Solutions sur mesure, avec le plus grand respect de la confidentialité et de la discrétion.",
+    modal_title:"Demander une consultation privée",
+    modal_body:"Une description claire de votre situation et de vos objectifs nous permet d’évaluer son importance et de déterminer des honoraires appropriés, selon l’ampleur, la complexité et l’urgence de la demande, payables en Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Intelligence stratégique & conseil confidentiel 2026©️"
+  },
+
+  es: {
+    nav_about:"Acerca de", nav_vision:"Visión", nav_mission:"Misión", nav_services:"Servicios",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Elegir AKASHA Consultancy significa dar un paso más cerca de tu visión.",
+    hero_line2:"Juntos creamos caminos hacia el crecimiento, la armonía y un impacto duradero.",
+    hero_cta:"Solicitar consulta privada",
+    wisdom_title:"La sabiduría de Akasha",
+    wisdom_body:"Los Registros Akáshicos suelen describirse como una biblioteca universal: un archivo vivo de todos los pensamientos, palabras y acciones jamás concebidos. Actualizados continuamente, ofrecen sabiduría y guía atemporales para el crecimiento personal y colectivo. En AKASHA Consultancy, nos inspiramos en esta fuente para ayudar a personas y organizaciones a alinearse con su máximo potencial.",
+    vision_title:"Visión",
+    vision_body:"Estamos comprometidos con nutrir los valores humanos, fomentar la armonía en la sociedad y cultivar el equilibrio con la naturaleza. Nuestro objetivo es inspirar a las personas a desbloquear sus talentos únicos y crear una calidad duradera en sus mundos interior y exterior. A través de este trabajo, buscamos generar oportunidades, empoderar comunidades y apoyar un cambio significativo a escala global.",
+    mission_title:"Misión",
+    mission_body:"En AKASHA Consultancy, nuestra misión es mejorar la calidad de vida y los servicios proporcionando información clara, transparente y significativa.",
+    services_title:"Qué hacemos",
+    svc1_title:"Perspectivas analíticas",
+    svc1_body:"Análisis de información pública y privada para ofrecer perspectivas valiosas sobre proyectos actuales y futuros.",
+    svc2_title:"Comunicación colaborativa",
+    svc2_body:"Construcción de conexiones con propósito entre organizaciones, empresas e individuos.",
+    svc3_title:"Servicios confidenciales",
+    svc3_body:"Soluciones a medida con el máximo respeto por la privacidad y la discreción.",
+    modal_title:"Solicitar una consulta privada",
+    modal_body:"Una descripción clara de tu asunto y objetivos nos permite evaluar su importancia y determinar la tarifa adecuada, basada en el alcance, la complejidad y la urgencia de la solicitud, pagadera en Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Inteligencia estratégica y asesoría confidencial 2026©️"
+  },
+
+  ru: {
+    nav_about:"О нас", nav_vision:"Видение", nav_mission:"Миссия", nav_services:"Услуги",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Выбирая AKASHA Consultancy, вы делаете шаг ближе к своей цели.",
+    hero_line2:"Вместе мы создаём пути к росту, гармонии и устойчивому влиянию.",
+    hero_cta:"Запросить частную консультацию",
+    wisdom_title:"Мудрость Акаши",
+    wisdom_body:"Записи Акаши часто описывают как универсальную библиотеку — живой архив всех мыслей, слов и действий, когда-либо возникших. Постоянно обновляясь, они дают вне-временную мудрость и guidance для личного и коллективного роста. В AKASHA Consultancy мы черпаем вдохновение из этого источника, помогая людям и организациям согласоваться с их наивысшим потенциалом.",
+    vision_title:"Видение",
+    vision_body:"Мы стремимся поддерживать человеческие ценности, укреплять гармонию в обществе и развивать баланс с природой. Наша цель — вдохновлять людей раскрывать уникальные таланты и создавать устойчивое качество во внутреннем и внешнем мире. Благодаря этой работе мы формируем новые возможности, усиливаем сообщества и поддерживаем значимые изменения на глобальном уровне.",
+    mission_title:"Миссия",
+    mission_body:"Миссия AKASHA Consultancy — повышать качество жизни и услуг, предоставляя ясные, прозрачные и значимые инсайты.",
+    services_title:"Что мы делаем",
+    svc1_title:"Аналитические инсайты",
+    svc1_body:"Анализ публичной и частной информации для формирования ценных перспектив по текущим и будущим проектам.",
+    svc2_title:"Совместная коммуникация",
+    svc2_body:"Создание целевых связей между организациями, бизнесом и людьми.",
+    svc3_title:"Конфиденциальные услуги",
+    svc3_body:"Индивидуальные решения с максимальным уважением к приватности и дискретности.",
+    modal_title:"Запрос частной консультации",
+    modal_body:"Чёткое описание вашего запроса и целей помогает нам оценить его важность и определить стоимость услуги, исходя из масштаба, сложности и срочности; оплата осуществляется в Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — стратегическая разведка и конфиденциальный консалтинг 2026©️"
+  },
+
+  ar: {
+    nav_about:"حول", nav_vision:"الرؤية", nav_mission:"المهمة", nav_services:"الخدمات",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"اختيار AKASHA Consultancy يعني الاقتراب خطوة من رؤيتك.",
+    hero_line2:"معًا نُنشئ مسارات للنمو والانسجام وتأثيرٍ مستدام.",
+    hero_cta:"طلب استشارة خاصة",
+    wisdom_title:"حكمة الأكاشا",
+    wisdom_body:"غالبًا ما تُوصف سجلات الأكاشا بأنها مكتبة عالمية — أرشيف حي لكل الأفكار والكلمات والأفعال التي وُجدت على الإطلاق. وبحكم تحديثها المستمر، فهي تقدم حكمة وإرشادًا خارج حدود الزمن للنمو الشخصي والجماعي. في AKASHA Consultancy نستمد الإلهام من هذا المصدر لمساعدة الأفراد والمنظمات على التوافق مع أعلى إمكاناتهم.",
+    vision_title:"الرؤية",
+    vision_body:"نلتزم برعاية القيم الإنسانية وتعزيز الانسجام داخل المجتمع وتنمية التوازن مع الطبيعة. هدفنا هو إلهام الناس لاكتشاف مواهبهم الفريدة وصناعة جودةٍ مستدامة في عوالمهم الداخلية والخارجية. ومن خلال هذا العمل، نسعى لخلق فرص وتمكين المجتمعات ودعم تغييرٍ ذي معنى على نطاق عالمي.",
+    mission_title:"المهمة",
+    mission_body:"مهمتنا في AKASHA Consultancy هي الارتقاء بجودة الحياة والخدمات عبر تقديم رؤى واضحة وشفافة وذات قيمة.",
+    services_title:"ماذا نفعل",
+    svc1_title:"رؤى تحليلية",
+    svc1_body:"تحليل المعلومات العامة والخاصة لتقديم منظورٍ قيّم حول المشاريع الحالية والمستقبلية.",
+    svc2_title:"تواصل تعاوني",
+    svc2_body:"بناء روابط هادفة بين المنظمات والشركات والأفراد.",
+    svc3_title:"خدمات سرّية",
+    svc3_body:"تصميم حلول وفق احتياجات فريدة مع أعلى درجات الخصوصية والسرّية.",
+    modal_title:"طلب استشارة خاصة",
+    modal_body:"يساعدنا الوصف الواضح لموضوعك وأهدافك على تقييم أهميته وتحديد الرسوم المناسبة بناءً على نطاق الطلب وتعقيده واستعجاله؛ ويتم الدفع بالبيتكوين.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — ذكاء استراتيجي واستشارات سرّية 2026©️"
+  },
+
+  zh: {
+    nav_about:"关于", nav_vision:"愿景", nav_mission:"使命", nav_services:"服务",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"选择 AKASHA Consultancy，意味着离你的愿景更近一步。",
+    hero_line2:"我们携手开辟通往成长、和谐与持久影响的道路。",
+    hero_cta:"申请私人咨询",
+    wisdom_title:"Akasha 的智慧",
+    wisdom_body:"阿卡西记录常被描述为一座宇宙图书馆——记录一切思想、言语与行为的“活档案”。它持续更新，为个人与集体成长提供超越时间的智慧与指引。在 AKASHA Consultancy，我们从这一源泉汲取灵感，帮助个人与组织与其最高潜能对齐。",
+    vision_title:"愿景",
+    vision_body:"我们致力于培育人类价值、促进社会和谐，并与自然保持平衡。我们的目标是激励人们释放独特才能，在内在与外在世界创造持久的质量与成果。通过这项工作，我们努力创造机会、赋能社区，并在全球范围支持有意义的改变。",
+    mission_title:"使命",
+    mission_body:"AKASHA Consultancy 的使命是通过提供清晰、透明且有意义的洞察，提升生活与服务的质量。",
+    services_title:"我们做什么",
+    svc1_title:"分析洞察",
+    svc1_body:"分析公开与非公开信息，为当前与未来项目提供有价值的视角。",
+    svc2_title:"协作沟通",
+    svc2_body:"在组织、企业与个人之间建立有目的的连接。",
+    svc3_title:"保密服务",
+    svc3_body:"以最高程度的隐私与谨慎，为独特需求定制解决方案。",
+    modal_title:"申请私人咨询",
+    modal_body:"清晰描述你的事项与目标，有助于我们评估其重要性并确定合适的服务费用；费用将根据范围、复杂度与紧急程度确定，并以比特币支付。",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — 战略情报与保密咨询 2026©️"
+  },
+
+  lt: {
+    nav_about:"Apie", nav_vision:"Vizija", nav_mission:"Misija", nav_services:"Paslaugos",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Pasirinkti AKASHA Consultancy reiškia žengti žingsnį arčiau savo vizijos.",
+    hero_line2:"Kartu kuriame kelią į augimą, harmoniją ir ilgalaikį poveikį.",
+    hero_cta:"Prašyti privačios konsultacijos",
+    wisdom_title:"Akašos išmintis",
+    wisdom_body:"Akašos įrašai dažnai apibūdinami kaip universali biblioteka — gyvas visų minčių, žodžių ir veiksmų archyvas. Nuolat atnaujinami, jie suteikia laiko nepavaldžią išmintį ir kryptį asmeniniam bei kolektyviniam augimui. AKASHA Consultancy įkvėpimo semiamės iš šio šaltinio, kad padėtume asmenims ir organizacijoms susiderinti su aukščiausiu potencialu.",
+    vision_title:"Vizija",
+    vision_body:"Esame įsipareigoję puoselėti žmogiškąsias vertybes, stiprinti darną visuomenėje ir ugdyti pusiausvyrą su gamta. Siekiame įkvėpti žmones atskleisti unikalius talentus ir kurti ilgalaikę kokybę tiek vidiniame, tiek išoriniame pasaulyje. Šiuo darbu kuriame galimybes, stipriname bendruomenes ir remiame prasmingus pokyčius pasauliniu mastu.",
+    mission_title:"Misija",
+    mission_body:"AKASHA Consultancy misija — gerinti gyvenimo ir paslaugų kokybę teikiant aiškias, skaidrias ir prasmingas įžvalgas.",
+    services_title:"Ką mes darome",
+    svc1_title:"Analitinės įžvalgos",
+    svc1_body:"Viešos ir privačios informacijos analizė, suteikianti vertingą perspektyvą apie dabartinius ir būsimus projektus.",
+    svc2_title:"Bendradarbiavimo komunikacija",
+    svc2_body:"Tikslingų ryšių kūrimas tarp organizacijų, verslų ir žmonių.",
+    svc3_title:"Konfidencialios paslaugos",
+    svc3_body:"Sprendimai, pritaikyti unikaliems poreikiams, maksimaliai gerbiant privatumą ir diskreciją.",
+    modal_title:"Prašyti privačios konsultacijos",
+    modal_body:"Aiškus situacijos ir tikslų aprašymas padeda įvertinti svarbą ir nustatyti paslaugos kainą pagal apimtį, sudėtingumą ir skubumą; apmokėjimas — Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — strateginė žvalgyba ir konfidencialios konsultacijos 2026©️"
+  },
+
+  pt: {
+    nav_about:"Sobre", nav_vision:"Visão", nav_mission:"Missão", nav_services:"Serviços",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Escolher a AKASHA Consultancy é dar um passo mais perto da sua visão.",
+    hero_line2:"Juntos, criamos caminhos para o crescimento, a harmonia e um impacto duradouro.",
+    hero_cta:"Solicitar consulta privada",
+    wisdom_title:"A Sabedoria de Akasha",
+    wisdom_body:"Os Registos Akáshicos são frequentemente descritos como uma biblioteca universal — um arquivo vivo de todos os pensamentos, palavras e ações alguma vez concebidos. Atualizados continuamente, oferecem sabedoria e orientação intemporais para o crescimento pessoal e coletivo. Na AKASHA Consultancy, inspiramo-nos nesta fonte para ajudar indivíduos e organizações a alinhar-se com o seu mais alto potencial.",
+    vision_title:"Visão",
+    vision_body:"Estamos comprometidos em nutrir valores humanos, promover harmonia na sociedade e cultivar equilíbrio com a natureza. O nosso objetivo é inspirar pessoas a desbloquear talentos únicos e criar qualidade duradoura nos seus mundos interior e exterior. Através deste trabalho, procuramos gerar oportunidades, capacitar comunidades e apoiar mudanças significativas à escala global.",
+    mission_title:"Missão",
+    mission_body:"Na AKASHA Consultancy, a nossa missão é melhorar a qualidade de vida e dos serviços, fornecendo insights claros, transparentes e significativos.",
+    services_title:"O que fazemos",
+    svc1_title:"Insights analíticos",
+    svc1_body:"Análise de informação pública e privada para oferecer perspetivas valiosas sobre projetos atuais e futuros.",
+    svc2_title:"Comunicação colaborativa",
+    svc2_body:"Construção de ligações com propósito entre organizações, empresas e indivíduos.",
+    svc3_title:"Serviços confidenciais",
+    svc3_body:"Soluções à medida com o máximo respeito pela privacidade e discrição.",
+    modal_title:"Solicitar uma consulta privada",
+    modal_body:"Uma descrição clara do seu assunto e objetivos permite-nos avaliar a importância e definir a tarifa adequada, baseada no âmbito, complexidade e urgência do pedido; pagável em Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Inteligência estratégica e consultoria confidencial 2026©️"
+  },
+
+  de: {
+    nav_about:"Über uns", nav_vision:"Vision", nav_mission:"Mission", nav_services:"Leistungen",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"AKASHA Consultancy zu wählen bedeutet, Ihrer Vision einen Schritt näher zu kommen.",
+    hero_line2:"Gemeinsam schaffen wir Wege zu Wachstum, Harmonie und nachhaltiger Wirkung.",
+    hero_cta:"Private Beratung anfragen",
+    wisdom_title:"Die Weisheit von Akasha",
+    wisdom_body:"Die Akasha-Aufzeichnungen werden oft als universelle Bibliothek beschrieben — ein lebendiges Archiv aller Gedanken, Worte und Handlungen, die je entstanden sind. Kontinuierlich aktualisiert, bieten sie zeitlose Weisheit und Orientierung für persönliches und kollektives Wachstum. Bei AKASHA Consultancy schöpfen wir aus dieser Quelle, um Menschen und Organisationen dabei zu unterstützen, sich an ihrem höchsten Potenzial auszurichten.",
+    vision_title:"Vision",
+    vision_body:"Wir setzen uns dafür ein, menschliche Werte zu stärken, Harmonie in der Gesellschaft zu fördern und das Gleichgewicht mit der Natur zu kultivieren. Unser Ziel ist es, Menschen zu inspirieren, ihre einzigartigen Talente zu entfalten und nachhaltige Qualität im inneren wie äußeren Leben zu schaffen. Durch diese Arbeit möchten wir Chancen eröffnen, Gemeinschaften stärken und bedeutungsvolle Veränderungen global unterstützen.",
+    mission_title:"Mission",
+    mission_body:"Unsere Mission bei AKASHA Consultancy ist es, die Lebens- und Servicequalität durch klare, transparente und sinnvolle Erkenntnisse zu verbessern.",
+    services_title:"Was wir tun",
+    svc1_title:"Analytische Einblicke",
+    svc1_body:"Analyse öffentlicher und privater Informationen, um wertvolle Perspektiven auf aktuelle und zukünftige Projekte zu liefern.",
+    svc2_title:"Kollaborative Kommunikation",
+    svc2_body:"Aufbau zielgerichteter Verbindungen zwischen Organisationen, Unternehmen und Einzelpersonen.",
+    svc3_title:"Vertrauliche Services",
+    svc3_body:"Maßgeschneiderte Lösungen mit höchstem Respekt für Privatsphäre und Diskretion.",
+    modal_title:"Private Beratung anfragen",
+    modal_body:"Eine klare Beschreibung Ihres Anliegens und Ihrer Ziele hilft uns, die Bedeutung einzuschätzen und das passende Honorar festzulegen — basierend auf Umfang, Komplexität und Dringlichkeit; zahlbar in Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Strategische Intelligenz & vertrauliche Beratung 2026©️"
+  },
+
+  hi: {
+    nav_about:"परिचय", nav_vision:"दृष्टि", nav_mission:"मिशन", nav_services:"सेवाएँ",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"AKASHA Consultancy चुनना आपकी दृष्टि के एक कदम और करीब जाना है।",
+    hero_line2:"साथ मिलकर हम विकास, सामंजस्य और स्थायी प्रभाव के मार्ग बनाते हैं।",
+    hero_cta:"निजी परामर्श अनुरोध करें",
+    wisdom_title:"आकाशा की बुद्धि",
+    wisdom_body:"आकाशिक अभिलेखों को अक्सर एक सार्वभौमिक पुस्तकालय के रूप में वर्णित किया जाता है—यह सभी विचारों, शब्दों और कर्मों का एक जीवंत अभिलेख है। निरंतर अद्यतन होने के कारण, यह व्यक्तिगत और सामूहिक विकास के लिए कालातीत ज्ञान और मार्गदर्शन प्रदान करता है। AKASHA Consultancy में, हम इस स्रोत से प्रेरणा लेकर व्यक्तियों और संगठनों को उनकी सर्वोच्च क्षमता के अनुरूप होने में सहायता करते हैं।",
+    vision_title:"दृष्टि",
+    vision_body:"हम मानवीय मूल्यों को पोषित करने, समाज में सामंजस्य बढ़ाने और प्रकृति के साथ संतुलन विकसित करने के लिए प्रतिबद्ध हैं। हमारा उद्देश्य लोगों को उनकी अनूठी प्रतिभाओं को खोलने और आंतरिक तथा बाह्य दुनिया में स्थायी गुणवत्ता बनाने के लिए प्रेरित करना है। इस कार्य के माध्यम से, हम अवसर उत्पन्न करने, समुदायों को सशक्त बनाने और वैश्विक स्तर पर अर्थपूर्ण परिवर्तन का समर्थन करने का प्रयास करते हैं।",
+    mission_title:"मिशन",
+    mission_body:"AKASHA Consultancy में हमारा मिशन स्पष्ट, पारदर्शी और सार्थक अंतर्दृष्टि प्रदान करके जीवन और सेवाओं की गुणवत्ता को बेहतर बनाना है।",
+    services_title:"हम क्या करते हैं",
+    svc1_title:"विश्लेषणात्मक अंतर्दृष्टि",
+    svc1_body:"वर्तमान और भविष्य की परियोजनाओं पर मूल्यवान दृष्टिकोण देने हेतु सार्वजनिक और निजी जानकारी का विश्लेषण।",
+    svc2_title:"सहयोगात्मक संचार",
+    svc2_body:"संगठनों, व्यवसायों और व्यक्तियों के बीच उद्देश्यपूर्ण संबंध बनाना।",
+    svc3_title:"गोपनीय सेवाएँ",
+    svc3_body:"गोपनीयता और विवेक का सर्वोच्च सम्मान रखते हुए आवश्यकतानुसार समाधान तैयार करना।",
+    modal_title:"निजी परामर्श अनुरोध",
+    modal_body:"आपके विषय और उद्देश्यों का स्पष्ट विवरण हमें उसकी महत्ता का आकलन करने और उचित शुल्क निर्धारित करने में सहायता करता है; शुल्क अनुरोध के दायरे, जटिलता और तात्कालिकता पर आधारित है और Bitcoin में देय है।",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — रणनीतिक बुद्धिमत्ता एवं गोपनीय सलाह 2026©️"
+  },
+
+  ja: {
+    nav_about:"概要", nav_vision:"ビジョン", nav_mission:"ミッション", nav_services:"サービス",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"AKASHA Consultancyを選ぶことは、あなたのビジョンに一歩近づくことです。",
+    hero_line2:"私たちは共に、成長・調和・持続的な影響への道筋を創ります。",
+    hero_cta:"非公開コンサルテーションを依頼",
+    wisdom_title:"アカシャの叡智",
+    wisdom_body:"アカシックレコードは、しばしば宇宙の図書館——あらゆる思考・言葉・行動の「生きたアーカイブ」として語られます。絶えず更新され、個人と集合の成長のために時を超えた知恵と導きを提供します。AKASHA Consultancyはこの源泉から着想を得て、個人と組織が最高の可能性に整合することを支援します。",
+    vision_title:"ビジョン",
+    vision_body:"私たちは人間的価値を育み、社会の調和を促進し、自然とのバランスを培うことにコミットしています。人々が固有の才能を解き放ち、内面と外面の両方で持続的な質を創出できるよう鼓舞することが目的です。この取り組みにより、機会を生み、コミュニティを力づけ、世界規模で意味ある変化を支えます。",
+    mission_title:"ミッション",
+    mission_body:"AKASHA Consultancyの使命は、明確で透明性が高く、価値ある洞察を提供することで、生活とサービスの質を高めることです。",
+    services_title:"提供内容",
+    svc1_title:"分析的インサイト",
+    svc1_body:"公開・非公開情報を分析し、現在および将来のプロジェクトに有益な視点を提供します。",
+    svc2_title:"協働コミュニケーション",
+    svc2_body:"組織・企業・個人の間に、目的あるつながりを構築します。",
+    svc3_title:"機密サービス",
+    svc3_body:"プライバシーと慎重さを最優先し、ニーズに合わせた解決策を提供します。",
+    modal_title:"非公開コンサルテーションの依頼",
+    modal_body:"ご相談内容と目的を明確にご記載いただくことで、重要度を評価し、範囲・複雑性・緊急性に基づく適切な費用を算定します。お支払いはBitcoinです。",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — 戦略インテリジェンス＆機密アドバイザリー 2026©️"
+  },
+
+  vi: {
+    nav_about:"Giới thiệu", nav_vision:"Tầm nhìn", nav_mission:"Sứ mệnh", nav_services:"Dịch vụ",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Chọn AKASHA Consultancy là tiến gần hơn một bước tới tầm nhìn của bạn.",
+    hero_line2:"Cùng nhau, chúng ta tạo ra con đường dẫn tới tăng trưởng, hài hòa và tác động bền vững.",
+    hero_cta:"Yêu cầu tư vấn riêng",
+    wisdom_title:"Trí tuệ của Akasha",
+    wisdom_body:"Hồ sơ Akasha thường được mô tả như một thư viện phổ quát — kho lưu trữ sống của mọi suy nghĩ, lời nói và hành động từng tồn tại. Được cập nhật liên tục, chúng mang lại trí tuệ và định hướng vượt thời gian cho sự phát triển cá nhân và tập thể. Tại AKASHA Consultancy, chúng tôi lấy cảm hứng từ nguồn này để giúp cá nhân và tổ chức đồng bộ với tiềm năng cao nhất của họ.",
+    vision_title:"Tầm nhìn",
+    vision_body:"Chúng tôi cam kết nuôi dưỡng các giá trị nhân văn, thúc đẩy sự hài hòa trong xã hội và vun đắp cân bằng với thiên nhiên. Mục tiêu của chúng tôi là truyền cảm hứng để mỗi người khai mở tài năng độc đáo và tạo ra chất lượng bền vững trong cả thế giới bên trong lẫn bên ngoài. Thông qua công việc này, chúng tôi hướng tới tạo cơ hội, trao quyền cho cộng đồng và hỗ trợ những thay đổi có ý nghĩa trên quy mô toàn cầu.",
+    mission_title:"Sứ mệnh",
+    mission_body:"Sứ mệnh của AKASHA Consultancy là nâng cao chất lượng cuộc sống và dịch vụ bằng cách cung cấp những góc nhìn rõ ràng, minh bạch và giàu ý nghĩa.",
+    services_title:"Chúng tôi làm gì",
+    svc1_title:"Phân tích chuyên sâu",
+    svc1_body:"Phân tích thông tin công khai và riêng tư để đưa ra góc nhìn giá trị về các dự án hiện tại và tương lai.",
+    svc2_title:"Giao tiếp hợp tác",
+    svc2_body:"Xây dựng kết nối có mục đích giữa tổ chức, doanh nghiệp và cá nhân.",
+    svc3_title:"Dịch vụ bảo mật",
+    svc3_body:"Thiết kế giải pháp theo nhu cầu riêng với sự tôn trọng tối đa về quyền riêng tư và kín đáo.",
+    modal_title:"Yêu cầu tư vấn riêng",
+    modal_body:"Mô tả rõ vấn đề và mục tiêu giúp chúng tôi đánh giá tầm quan trọng và xác định mức phí phù hợp, dựa trên phạm vi, độ phức tạp và mức độ khẩn cấp; thanh toán bằng Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Tình báo chiến lược & tư vấn bảo mật 2026©️"
+  },
+
+  th: {
+    nav_about:"เกี่ยวกับ", nav_vision:"วิสัยทัศน์", nav_mission:"พันธกิจ", nav_services:"บริการ",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"การเลือก AKASHA Consultancy คือก้าวเข้าใกล้วิสัยทัศน์ของคุณอีกหนึ่งก้าว",
+    hero_line2:"เราร่วมกันสร้างเส้นทางสู่การเติบโต ความกลมกลืน และผลกระทบที่ยั่งยืน",
+    hero_cta:"ขอคำปรึกษาส่วนตัว",
+    wisdom_title:"ปัญญาแห่งอาคาชา",
+    wisdom_body:"บันทึกอาคาชามักถูกอธิบายว่าเป็นห้องสมุดสากล—คลังข้อมูลมีชีวิตของทุกความคิด คำพูด และการกระทำที่เคยเกิดขึ้น อัปเดตอย่างต่อเนื่องและมอบปัญญาและแนวทางเหนือกาลเวลาเพื่อการเติบโตทั้งส่วนบุคคลและส่วนรวม ที่ AKASHA Consultancy เราใช้แรงบันดาลใจจากแหล่งนี้เพื่อช่วยให้บุคคลและองค์กรสอดคล้องกับศักยภาพสูงสุดของตน",
+    vision_title:"วิสัยทัศน์",
+    vision_body:"เรามุ่งมั่นในการหล่อเลี้ยงคุณค่ามนุษย์ ส่งเสริมความกลมกลืนในสังคม และสร้างสมดุลกับธรรมชาติ เป้าหมายคือสร้างแรงบันดาลใจให้ผู้คนปลดล็อกความสามารถเฉพาะตัวและสร้างคุณภาพที่ยั่งยืนทั้งภายในและภายนอก ผ่านงานนี้ เรามุ่งสร้างโอกาส เสริมพลังชุมชน และสนับสนุนการเปลี่ยนแปลงที่มีความหมายในระดับโลก",
+    mission_title:"พันธกิจ",
+    mission_body:"พันธกิจของ AKASHA Consultancy คือยกระดับคุณภาพชีวิตและบริการด้วยการมอบข้อมูลเชิงลึกที่ชัดเจน โปร่งใส และมีความหมาย",
+    services_title:"เราทำอะไร",
+    svc1_title:"ข้อมูลเชิงลึกเชิงวิเคราะห์",
+    svc1_body:"วิเคราะห์ข้อมูลสาธารณะและข้อมูลส่วนตัวเพื่อมอบมุมมองที่มีคุณค่าต่อโครงการปัจจุบันและอนาคต",
+    svc2_title:"การสื่อสารร่วมมือ",
+    svc2_body:"สร้างความเชื่อมโยงที่มีเป้าหมายระหว่างองค์กร ธุรกิจ และบุคคล",
+    svc3_title:"บริการอย่างเป็นความลับ",
+    svc3_body:"ปรับโซลูชันให้เหมาะกับความต้องการเฉพาะ โดยเคารพความเป็นส่วนตัวและความรอบคอบสูงสุด",
+    modal_title:"ขอคำปรึกษาส่วนตัว",
+    modal_body:"การอธิบายเรื่องและเป้าหมายอย่างชัดเจนช่วยให้เราประเมินความสำคัญและกำหนดค่าบริการที่เหมาะสม โดยอิงจากขอบเขต ความซับซ้อน และความเร่งด่วนของคำขอ และชำระด้วย Bitcoin",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — ข่าวกรองเชิงกลยุทธ์และที่ปรึกษาแบบเป็นความลับ 2026©️"
+  },
+
+  sw: {
+    nav_about:"Kuhusu", nav_vision:"Dira", nav_mission:"Dhamira", nav_services:"Huduma",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Kuchagua AKASHA Consultancy ni kusogea hatua karibu na dira yako.",
+    hero_line2:"Pamoja, tunaunda njia za ukuaji, maelewano, na athari ya kudumu.",
+    hero_cta:"Omba ushauri binafsi",
+    wisdom_title:"Hekima ya Akasha",
+    wisdom_body:"Rekodi za Akasha mara nyingi hufafanuliwa kama maktaba ya ulimwengu — hazina hai ya mawazo, maneno na matendo yote yaliyowahi kuwapo. Zikisasishwa daima, hutoa hekima na mwongozo usiofungwa na wakati kwa ukuaji wa binafsi na wa pamoja. AKASHA Consultancy tunapata msukumo kutoka chanzo hiki ili kusaidia watu na mashirika kujipanga na uwezo wao wa juu zaidi.",
+    vision_title:"Dira",
+    vision_body:"Tumejitolea kukuza maadili ya kibinadamu, kuimarisha maelewano katika jamii, na kuendeleza uwiano na mazingira ya asili. Lengo letu ni kuhamasisha watu kufungua vipaji vyao vya kipekee na kuunda ubora wa kudumu ndani na nje. Kupitia kazi hii, tunalenga kuunda fursa, kuimarisha jamii na kuunga mkono mabadiliko yenye maana kimataifa.",
+    mission_title:"Dhamira",
+    mission_body:"Dhamira ya AKASHA Consultancy ni kuboresha ubora wa maisha na huduma kwa kutoa maarifa yaliyo wazi, ya uwazi na yenye maana.",
+    services_title:"Tunachofanya",
+    svc1_title:"Maarifa ya uchambuzi",
+    svc1_body:"Uchambuzi wa taarifa za umma na binafsi ili kutoa mitazamo yenye thamani kuhusu miradi ya sasa na ijayo.",
+    svc2_title:"Mawasiliano shirikishi",
+    svc2_body:"Kujenga miunganiko yenye kusudi kati ya mashirika, biashara na watu binafsi.",
+    svc3_title:"Huduma za siri",
+    svc3_body:"Kurekebisha suluhisho kwa mahitaji ya kipekee kwa kuheshimu faragha na usiri kwa kiwango cha juu.",
+    modal_title:"Omba ushauri binafsi",
+    modal_body:"Maelezo wazi ya suala lako na malengo yako hutusaidia kutathmini umuhimu wake na kuamua ada stahiki, kulingana na wigo, ugumu na uharaka wa ombi; malipo kwa Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Ujasusi wa kimkakati na ushauri wa siri 2026©️"
+  },
+
+  tl: {
+    nav_about:"Tungkol", nav_vision:"Bisyon", nav_mission:"Misyon", nav_services:"Serbisyo",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Ang pagpili sa AKASHA Consultancy ay isang hakbang palapit sa iyong bisyon.",
+    hero_line2:"Magkasama, lumilikha tayo ng mga daan tungo sa pag-unlad, pagkakaisa, at pangmatagalang epekto.",
+    hero_cta:"Humiling ng pribadong konsultasyon",
+    wisdom_title:"Ang Karunungan ng Akasha",
+    wisdom_body:"Ang Akashic Records ay madalas ilarawan bilang isang unibersal na aklatan—isang buhay na talaan ng lahat ng kaisipan, salita, at kilos na naisip o naranasan. Patuloy itong ina-update at nagbibigay ng walang-panahong karunungan at gabay para sa personal at kolektibong pag-unlad. Sa AKASHA Consultancy, kumukuha kami ng inspirasyon mula rito upang tulungan ang mga tao at organisasyon na umayon sa kanilang pinakamataas na potensyal.",
+    vision_title:"Bisyon",
+    vision_body:"Nakatuon kami sa paglinang ng mga pagpapahalagang pantao, pagpapalakas ng pagkakaisa sa lipunan, at paghubog ng balanse sa kalikasan. Layunin naming magbigay-inspirasyon upang mabuksan ang natatanging talento at makalikha ng pangmatagalang kalidad sa loob at labas. Sa pamamagitan nito, sinisikap naming lumikha ng mga oportunidad, palakasin ang mga komunidad, at suportahan ang makabuluhang pagbabago sa pandaigdigang antas.",
+    mission_title:"Misyon",
+    mission_body:"Misyon ng AKASHA Consultancy na pagbutihin ang kalidad ng buhay at serbisyo sa pamamagitan ng malinaw, transparent, at makabuluhang mga pananaw.",
+    services_title:"Ano ang ginagawa namin",
+    svc1_title:"Analytical Insights",
+    svc1_body:"Pagsusuri ng pampubliko at pribadong impormasyon upang magbigay ng mahalagang pananaw sa kasalukuyan at hinaharap na mga proyekto.",
+    svc2_title:"Collaborative Communication",
+    svc2_body:"Pagbuo ng makabuluhang koneksyon sa pagitan ng mga organisasyon, negosyo, at indibidwal.",
+    svc3_title:"Confidential Services",
+    svc3_body:"Pag-angkop ng solusyon sa natatanging pangangailangan na may pinakamataas na paggalang sa privacy at diskresyon.",
+    modal_title:"Humiling ng pribadong konsultasyon",
+    modal_body:"Ang malinaw na paglalarawan ng iyong usapin at layunin ay tumutulong sa amin na masuri ang kahalagahan at matukoy ang angkop na bayad, batay sa saklaw, komplikasyon, at pagkaapurahan; babayaran sa Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Strategic Intelligence & Confidential Advisory 2026©️"
+  },
+
+  sv: {
+    nav_about:"Om", nav_vision:"Vision", nav_mission:"Mission", nav_services:"Tjänster",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Att välja AKASHA Consultancy är att ta ett steg närmare din vision.",
+    hero_line2:"Tillsammans skapar vi vägar till tillväxt, harmoni och varaktig påverkan.",
+    hero_cta:"Begär privat konsultation",
+    wisdom_title:"Akashas visdom",
+    wisdom_body:"Akasha-registren beskrivs ofta som ett universellt bibliotek — ett levande arkiv över alla tankar, ord och handlingar som någonsin uppstått. Ständigt uppdaterade erbjuder de tidlös visdom och vägledning för personlig och kollektiv utveckling. På AKASHA Consultancy hämtar vi inspiration från denna källa för att hjälpa individer och organisationer att linjera med sin högsta potential.",
+    vision_title:"Vision",
+    vision_body:"Vi är engagerade i att vårda mänskliga värden, främja harmoni i samhället och odla balans med naturen. Vårt mål är att inspirera människor att frigöra sina unika talanger och skapa varaktig kvalitet i både den inre och yttre världen. Genom detta arbete vill vi skapa möjligheter, stärka gemenskaper och stödja meningsfull förändring globalt.",
+    mission_title:"Mission",
+    mission_body:"AKASHA Consultancys mission är att höja livs- och servicekvalitet genom tydliga, transparenta och meningsfulla insikter.",
+    services_title:"Vad vi gör",
+    svc1_title:"Analytiska insikter",
+    svc1_body:"Analys av offentlig och privat information för att ge värdefulla perspektiv på nuvarande och framtida projekt.",
+    svc2_title:"Samarbetskommunikation",
+    svc2_body:"Bygga målmedvetna kopplingar mellan organisationer, företag och individer.",
+    svc3_title:"Konfidentiella tjänster",
+    svc3_body:"Skräddarsydda lösningar med största respekt för integritet och diskretion.",
+    modal_title:"Begär privat konsultation",
+    modal_body:"En tydlig beskrivning av ditt ärende och dina mål hjälper oss att bedöma dess betydelse och fastställa rätt arvode baserat på omfattning, komplexitet och brådska; betalas i Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Strategisk intelligens & konfidentiell rådgivning 2026©️"
+  },
+
+  no: {
+    nav_about:"Om", nav_vision:"Visjon", nav_mission:"Misjon", nav_services:"Tjenester",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Å velge AKASHA Consultancy betyr å ta et steg nærmere din visjon.",
+    hero_line2:"Sammen skaper vi veier til vekst, harmoni og varig innvirkning.",
+    hero_cta:"Be om privat konsultasjon",
+    wisdom_title:"Akashas visdom",
+    wisdom_body:"Akasha-registrene beskrives ofte som et universelt bibliotek — et levende arkiv over alle tanker, ord og handlinger som noen gang er unnfanget. De oppdateres kontinuerlig og tilbyr tidløs visdom og veiledning for personlig og kollektiv vekst. I AKASHA Consultancy henter vi inspirasjon fra denne kilden for å hjelpe individer og organisasjoner med å rette seg inn mot sitt høyeste potensial.",
+    vision_title:"Visjon",
+    vision_body:"Vi er forpliktet til å nære menneskelige verdier, fremme harmoni i samfunnet og kultivere balanse med naturen. Målet vårt er å inspirere mennesker til å frigjøre sine unike talenter og skape varig kvalitet i både indre og ytre liv. Gjennom dette arbeidet søker vi å skape muligheter, styrke fellesskap og støtte meningsfull endring globalt.",
+    mission_title:"Misjon",
+    mission_body:"Vår misjon i AKASHA Consultancy er å forbedre livs- og tjenestekvalitet gjennom klare, transparente og meningsfulle innsikter.",
+    services_title:"Hva vi gjør",
+    svc1_title:"Analytiske innsikter",
+    svc1_body:"Analyse av offentlig og privat informasjon for å gi verdifulle perspektiver på nåværende og fremtidige prosjekter.",
+    svc2_title:"Samarbeidskommunikasjon",
+    svc2_body:"Bygge målrettede forbindelser mellom organisasjoner, bedrifter og enkeltpersoner.",
+    svc3_title:"Konfidensielle tjenester",
+    svc3_body:"Skreddersydde løsninger med høyeste respekt for personvern og diskresjon.",
+    modal_title:"Be om privat konsultasjon",
+    modal_body:"En tydelig beskrivelse av saken og målene dine hjelper oss å vurdere betydningen og fastsette riktig honorar basert på omfang, kompleksitet og hast; betales i Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Strategisk intelligens og konfidensiell rådgivning 2026©️"
+  },
+
+  fi: {
+    nav_about:"Tietoa", nav_vision:"Visio", nav_mission:"Missio", nav_services:"Palvelut",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"AKASHA Consultancyn valitseminen tarkoittaa askelta lähemmäs visiota.",
+    hero_line2:"Yhdessä luomme polkuja kasvuun, harmoniaan ja kestävään vaikutukseen.",
+    hero_cta:"Pyydä yksityinen konsultaatio",
+    wisdom_title:"Akashan viisaus",
+    wisdom_body:"Akasha-tietueita kuvataan usein universaalina kirjastona — elävänä arkistona kaikista ajatuksista, sanoista ja teoista. Jatkuvasti päivittyvinä ne tarjoavat ajattoman viisauden ja ohjauksen henkilökohtaiseen ja yhteiseen kasvuun. AKASHA Consultancy ammentaa tästä lähteestä tukeakseen yksilöitä ja organisaatioita kohti korkeinta potentiaaliaan.",
+    vision_title:"Visio",
+    vision_body:"Olemme sitoutuneet vaalimaan inhimillisiä arvoja, edistämään yhteiskunnallista harmoniaa ja kehittämään tasapainoa luonnon kanssa. Tavoitteemme on inspiroida ihmisiä vapauttamaan ainutlaatuiset kykynsä ja luomaan kestävää laatua sekä sisäiseen että ulkoiseen maailmaan. Tämän työn kautta pyrimme luomaan mahdollisuuksia, vahvistamaan yhteisöjä ja tukemaan merkityksellistä muutosta globaalisti.",
+    mission_title:"Missio",
+    mission_body:"AKASHA Consultancyn missio on parantaa elämän ja palveluiden laatua tarjoamalla selkeitä, läpinäkyviä ja merkityksellisiä oivalluksia.",
+    services_title:"Mitä teemme",
+    svc1_title:"Analyyttiset oivallukset",
+    svc1_body:"Julkisen ja yksityisen tiedon analyysi arvokkaiden näkökulmien tuottamiseksi nykyisiin ja tuleviin hankkeisiin.",
+    svc2_title:"Yhteistyöhön perustuva viestintä",
+    svc2_body:"Tarkoituksellisten yhteyksien rakentaminen organisaatioiden, yritysten ja yksilöiden välille.",
+    svc3_title:"Luottamukselliset palvelut",
+    svc3_body:"Räätälöidyt ratkaisut, joissa yksityisyyttä ja hienovaraisuutta kunnioitetaan korkeimmalla tasolla.",
+    modal_title:"Pyydä yksityinen konsultaatio",
+    modal_body:"Selkeä kuvaus asiastasi ja tavoitteistasi auttaa meitä arvioimaan sen tärkeyttä ja määrittämään sopivan palkkion laajuuden, monimutkaisuuden ja kiireellisyyden perusteella; maksu Bitcoinilla.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Strateginen tiedustelu & luottamuksellinen neuvonta 2026©️"
+  },
+
+  ms: {
+    nav_about:"Tentang", nav_vision:"Visi", nav_mission:"Misi", nav_services:"Perkhidmatan",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Memilih AKASHA Consultancy bermakna anda selangkah lebih dekat dengan visi anda.",
+    hero_line2:"Bersama-sama, kami membina laluan ke arah pertumbuhan, keharmonian dan impak berkekalan.",
+    hero_cta:"Mohon konsultasi peribadi",
+    wisdom_title:"Kebijaksanaan Akasha",
+    wisdom_body:"Rekod Akasha sering digambarkan sebagai perpustakaan sejagat — arkib hidup bagi semua pemikiran, kata-kata dan tindakan yang pernah wujud. Dikemas kini berterusan, ia menawarkan kebijaksanaan dan panduan merentas masa untuk pertumbuhan peribadi dan kolektif. Di AKASHA Consultancy, kami mengambil inspirasi daripada sumber ini untuk membantu individu dan organisasi selari dengan potensi tertinggi mereka.",
+    vision_title:"Visi",
+    vision_body:"Kami komited untuk memupuk nilai kemanusiaan, mengukuhkan keharmonian dalam masyarakat dan membina keseimbangan dengan alam. Matlamat kami adalah mengilhamkan orang ramai untuk membuka bakat unik serta mencipta kualiti yang berkekalan dalam dunia dalaman dan luaran. Melalui kerja ini, kami berusaha menjana peluang, memperkasa komuniti dan menyokong perubahan bermakna di peringkat global.",
+    mission_title:"Misi",
+    mission_body:"Misi AKASHA Consultancy ialah meningkatkan kualiti hidup dan perkhidmatan dengan menyediakan wawasan yang jelas, telus dan bermakna.",
+    services_title:"Apa yang kami lakukan",
+    svc1_title:"Wawasan analitik",
+    svc1_body:"Analisis maklumat awam dan peribadi untuk memberikan perspektif bernilai mengenai projek semasa dan akan datang.",
+    svc2_title:"Komunikasi kolaboratif",
+    svc2_body:"Membina hubungan bermatlamat antara organisasi, perniagaan dan individu.",
+    svc3_title:"Perkhidmatan sulit",
+    svc3_body:"Penyelesaian tersuai dengan penghormatan tertinggi terhadap privasi dan budi bicara.",
+    modal_title:"Mohon konsultasi peribadi",
+    modal_body:"Huraian jelas tentang perkara dan objektif anda membantu kami menilai kepentingannya serta menentukan yuran yang sesuai berdasarkan skop, kerumitan dan keutamaan; bayaran melalui Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Perisikan strategik & nasihat sulit 2026©️"
+  },
+
+  id: {
+    nav_about:"Tentang", nav_vision:"Visi", nav_mission:"Misi", nav_services:"Layanan",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Memilih AKASHA Consultancy berarti melangkah lebih dekat menuju visi Anda.",
+    hero_line2:"Bersama, kita menciptakan jalur menuju pertumbuhan, harmoni, dan dampak yang bertahan.",
+    hero_cta:"Minta konsultasi privat",
+    wisdom_title:"Kebijaksanaan Akasha",
+    wisdom_body:"Catatan Akasha sering digambarkan sebagai perpustakaan universal — arsip hidup dari semua pikiran, kata, dan tindakan yang pernah ada. Terus diperbarui, ia menawarkan kebijaksanaan dan panduan lintas waktu untuk pertumbuhan pribadi dan kolektif. Di AKASHA Consultancy, kami mengambil inspirasi dari sumber ini untuk membantu individu dan organisasi selaras dengan potensi tertinggi mereka.",
+    vision_title:"Visi",
+    vision_body:"Kami berkomitmen untuk memelihara nilai-nilai kemanusiaan, mendorong harmoni dalam masyarakat, dan menumbuhkan keseimbangan dengan alam. Tujuan kami adalah menginspirasi orang untuk membuka talenta unik dan menciptakan kualitas yang bertahan dalam dunia batin dan lahir. Melalui pekerjaan ini, kami berupaya menciptakan peluang, memberdayakan komunitas, dan mendukung perubahan bermakna pada skala global.",
+    mission_title:"Misi",
+    mission_body:"Misi AKASHA Consultancy adalah meningkatkan kualitas hidup dan layanan dengan menyediakan wawasan yang jelas, transparan, dan bermakna.",
+    services_title:"Apa yang kami lakukan",
+    svc1_title:"Wawasan analitis",
+    svc1_body:"Analisis informasi publik dan privat untuk memberikan perspektif berharga atas proyek saat ini dan masa depan.",
+    svc2_title:"Komunikasi kolaboratif",
+    svc2_body:"Membangun koneksi yang berfokus tujuan antara organisasi, bisnis, dan individu.",
+    svc3_title:"Layanan rahasia",
+    svc3_body:"Solusi yang disesuaikan untuk kebutuhan unik dengan penghormatan tertinggi pada privasi dan diskresi.",
+    modal_title:"Minta konsultasi privat",
+    modal_body:"Deskripsi yang jelas tentang perkara dan tujuan Anda membantu kami menilai pentingnya dan menentukan biaya layanan yang tepat berdasarkan cakupan, kompleksitas, dan urgensi; dibayar dengan Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Intelijen strategis & penasihat rahasia 2026©️"
+  },
+
+  is: {
+    nav_about:"Um", nav_vision:"Sýn", nav_mission:"Markmið", nav_services:"Þjónusta",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Að velja AKASHA Consultancy er að taka skref nær sýn þinni.",
+    hero_line2:"Saman mótum við leiðir að vexti, samhljómi og varanlegum áhrifum.",
+    hero_cta:"Óska eftir einkaráðgjöf",
+    wisdom_title:"Viska Akasha",
+    wisdom_body:"Akasha-skráin er oft lýst sem alheimssafni — lifandi skjalasafni allra hugsana, orða og gjörða. Hún er stöðugt uppfærð og veitir tímalausa visku og leiðsögn fyrir persónulegan og sameiginlegan vöxt. Hjá AKASHA Consultancy sækjum við innblástur í þessa uppsprettu til að hjálpa einstaklingum og stofnunum að samræmast hæsta möguleika sínum.",
+    vision_title:"Sýn",
+    vision_body:"Við erum staðráðin í að efla mannleg gildi, stuðla að samhljómi í samfélaginu og rækta jafnvægi við náttúruna. Markmiðið er að hvetja fólk til að leysa úr læðingi einstaka hæfileika og skapa varanleg gæði bæði innra og ytra. Með þessari vinnu viljum við skapa tækifæri, styrkja samfélög og styðja merkingarbæra breytingu á heimsvísu.",
+    mission_title:"Markmið",
+    mission_body:"Markmið AKASHA Consultancy er að bæta lífsgæði og þjónustu með skýrum, gagnsæjum og merkingarbærum innsýnum.",
+    services_title:"Hvað við gerum",
+    svc1_title:"Greinandi innsýn",
+    svc1_body:"Greining á opinberum og einkareknum upplýsingum til að veita dýrmæt sjónarhorn á núverandi og framtíðarverkefni.",
+    svc2_title:"Samvinnusamskipti",
+    svc2_body:"Að byggja markviss tengsl milli stofnana, fyrirtækja og einstaklinga.",
+    svc3_title:"Trúnaðarþjónusta",
+    svc3_body:"Sérsniðnar lausnir með mestu virðingu fyrir friðhelgi og nærgætni.",
+    modal_title:"Óska eftir einkaráðgjöf",
+    modal_body:"Skýr lýsing á málinu þínu og markmiðum hjálpar okkur að meta mikilvægi þess og ákveða viðeigandi gjald miðað við umfang, flækjustig og brýni; greitt í Bitcoin.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Stefnumótandi greind og trúnaðar-ráðgjöf 2026©️"
+  },
+
+  /* Kalaallisut: using English text (professional fallback) */
+  kl: {
+    nav_about:"About", nav_vision:"Vision", nav_mission:"Mission", nav_services:"Services",
+    hero_title:"AKASHA Consultancy",
+    hero_line1:"Choosing AKASHA Consultancy means taking a step closer to your vision.",
+    hero_line2:"Together, we create pathways to growth, harmony, and lasting impact.",
+    hero_cta:"Request Private Consultation",
+    wisdom_title:"The Wisdom of Akasha",
+    wisdom_body:"The Akasha Records are often described as a universal library, a living archive of all thoughts, words, and actions ever conceived. Continuously updated, they offer timeless wisdom and guidance for both personal and collective growth. At AKASHA Consultancy, we draw inspiration from this source to help individuals and organizations align with their highest potential.",
+    vision_title:"Vision",
+    vision_body:"We are committed to nurturing human values, fostering harmony within society, and cultivating balance with nature. Our aim is to inspire people to unlock their unique talents and create lasting quality in both their inner and outer worlds. Through this work, we strive to generate opportunities, empower communities, and support meaningful change on a global scale.",
+    mission_title:"Mission",
+    mission_body:"At AKASHA Consultancy, our mission is to enhance the quality of life and services by providing clear, transparent, and meaningful insights.",
+    services_title:"What We Do",
+    svc1_title:"Analytical Insights",
+    svc1_body:"Analysis of public and private information to offer valuable perspectives on current and future projects.",
+    svc2_title:"Collaborative Communication",
+    svc2_body:"Building purposeful connections between organizations, businesses, and individuals.",
+    svc3_title:"Confidential Services",
+    svc3_body:"Tailoring solutions to unique needs with the highest respect for privacy and discretion.",
+    modal_title:"Request a Private Consultation",
+    modal_body:"Providing a clear description of your matter and the objectives you intend to achieve enables us to assess its significance and determine the appropriate service fee, based on the scope, complexity, and urgency of the request.",
+    modal_email:"everyday247work@gmail.com",
+    footer:"AKASHA Consultancy — Strategic Intelligence & Confidential Advisory 2026©️"
+  }
+};
+// Make translations accessible (used by applyLanguage)
+window.I18N = I18N;
+
+const LANG_MAP = {
+  "en-sg":"en",
+  "de-ch":"de",
+  "pt-br":"pt",
+  "es-mx":"es",
+  "ar-eg":"ar",
+  "ms-bn":"ms"
+};
+
+function applyLanguage(lang){
+  const base = LANG_MAP[lang] || lang;
+  const dict = (window.I18N && window.I18N[base]) ? window.I18N[base] : (window.I18N ? window.I18N.en : null);
+
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(dict && dict[key] !== undefined) el.textContent = dict[key];
+    else if(window.I18N && window.I18N.en && window.I18N.en[key] !== undefined) el.textContent = window.I18N.en[key];
+  });
+
+  const meta = LANG_META[lang] || LANG_META[base] || LANG_META.en;
+  document.documentElement.lang = base;
+
+  if(meta.dir === "rtl"){
+    document.body.classList.add('rtl');
+    document.documentElement.dir = "rtl";
+  }else{
+    document.body.classList.remove('rtl');
+    document.documentElement.dir = "ltr";
+  }
+
+  document.getElementById('langFlag').textContent = meta.flag;
+  document.getElementById('langCode').textContent = meta.code;
+
+  localStorage.setItem('akasha_lang', lang);
+  updateNavHeight();
+}
+
+/* Language UI */
+const langSelect = document.getElementById('langSelect');
+const langBtn = document.getElementById('langBtn');
+
+langBtn.addEventListener('click',(e)=>{
+  e.stopPropagation();
+  // If mobile menu is open, close it so UI never overlaps
+  if(nav.classList.contains('menu-open')) closeMenu();
+
+  const isOpen = langSelect.classList.toggle('open');
+  langBtn.setAttribute('aria-expanded', String(isOpen));
+});
+
+document.getElementById('langMenu').addEventListener('click',(e)=>{
+  const btn = e.target.closest('.lang-item');
+  if(!btn) return;
+  const lang = btn.getAttribute('data-lang');
+  applyLanguage(lang);
+  langSelect.classList.remove('open');
+  langBtn.setAttribute('aria-expanded',"false");
+});
+
+document.addEventListener('click',()=>{
+  langSelect.classList.remove('open');
+  langBtn.setAttribute('aria-expanded',"false");
+});
+
+// ESC closes menus + modal
+document.addEventListener('keydown',(e)=>{
+  if(e.key !== 'Escape') return;
+
+  // close language dropdown
+  langSelect.classList.remove('open');
+  langBtn.setAttribute('aria-expanded',"false");
+
+  // close mobile menu
+  closeMenu();
+
+  // close modal if open
+  if(modal.classList.contains('active')){
+    modal.classList.remove('active');
+    document.body.style.overflow = "auto";
+  }
+});
+
+/* Init */
+applyLanguage(localStorage.getItem('akasha_lang') || 'en');
+</script>
+
+</body>
+</html>
